@@ -23,9 +23,6 @@ import java.io._
 
 
 /**
- *
- * Implements the "WordCount" program that computes a simple word occurrence histogram
- * over some sample data
  * Este programa implementa el conteo de palabras sobre N cantidad de archivos fuente en un directorio. El nombre del
  * directorio donde se encuentran estos archivos es recibido como argumento, y es la carpeta resources que está dentro del
  */
