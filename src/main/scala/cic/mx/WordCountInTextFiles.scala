@@ -26,15 +26,14 @@ import java.io._
  *
  * Implements the "WordCount" program that computes a simple word occurrence histogram
  * over some sample data
- *
- * This example shows how to:
- *
- *   - write a simple Flink program.
- *   - use Tuple data types.
- *   - write and use user-defined functions.
+ * Este programa implementa el conteo de palabras sobre N cantidad de archivos fuente en un directorio. El nombre del
+ * directorio donde se encuentran estos archivos es recibido como argumento, y es la carpeta resources que está dentro del
  */
 object WordCountInTextFiles {
-
+  /**
+   *  Esta función recibe como argumento el nombre de un directorio, itera sobre éste obteniendo los nombres de los archivos
+   *  y los devolvuelve en una lista.
+   */
   def getListOfFiles(dir: File): List[String] =
     dir.listFiles
       .filter(_.isFile)
@@ -43,25 +42,44 @@ object WordCountInTextFiles {
 
   def main(args: Array[String]) {
 
-    // set up the execution environment
+    // Se inicializa el ambiente de ejecución.
     val env = ExecutionEnvironment.getExecutionEnvironment
 
-    val filewriter = new PrintWriter(new File("resources/out/output.txt"))
-
+    /* Inicializa la variable inputDir, con el valor "resources" que le es pasado como primer argumento. El nombre de este directorio
+     * es donde están los archivos fuente
+    */
     val inputDir = new File(args(0))
+
+    /* Definimos la salida a archivo para guardar las estadísticas de los archivos que se procesarán.
+    */
+    val filewriter = new PrintWriter(new File(inputDir+"/out/output.txt"))
+
+    /* Definimos textFiles como una lista de los archivos (fuente). Y también definimos la variable numFiles donde guardaremos
+    *  el número de archivos del directorio
+    */
 
     val textFiles = getListOfFiles(inputDir)
     var numFiles = 0
+
+    /* Esta iteración sobre la lista textFiles guardará en el archivo de salida el nombre de los archivos del directorio resources.
+    *  la variable numFiles se incrementará en uno para contabilizar el total de archivos.
+    */
     for (tf <- textFiles){
       filewriter.write(tf+", ")
       numFiles+=1
     }
+    // Terminado de iterar sobre la lista de archivos guardamos el total de archivos en el archivo de salida.
     filewriter.write("#Files("+numFiles+")")
 
+    /* En esta iteración sobre la lista de archivos se obtiene el total de palabras leídas en los archivos,
+    *  aplicando la función count sobre la segmentación en palabras realizada por la función flatMap con la expresión regular \\W+.
+    *
+    *  El conteo de cada archivo se suma al valor de la variable totalWordsRead
+    */
     filewriter.write("\n****************\n")
     var totalWordsRead = 0
     for (tf <- textFiles){
-      val text = env.readTextFile(args(0)+"/"+tf)
+      val text = env.readTextFile(inputDir+"/"+tf)
       val counts = text.flatMap{ _.toLowerCase.split("\\W+")}
         .map{(_,1)}
         .count()
@@ -69,11 +87,14 @@ object WordCountInTextFiles {
       totalWordsRead += counts.intValue
     }
 
+    // Terminado esta iteración guardamos el total de palabras de todos los archivos en el archivo de salida.
     filewriter.write("\n****************")
     filewriter.write("\n#TotalWordsRead("+totalWordsRead+")")
     filewriter.write("\n****************")
 
-
+    /* En esta iteración sobre la lista de archivos, a través de las funciones groupBy (palabra) y sum (para sumarizar por palabra),
+    *  obtenemos la recurrencia de palabras de cada archivo y la guardamos en nuestro archivo de salida.
+    */
     for (tf <- textFiles){
       filewriter.write("\n"+tf+"\n")
       val text = env.readTextFile(args(0)+"/"+tf)
@@ -84,6 +105,8 @@ object WordCountInTextFiles {
         .sum(1)
       filewriter.write(counts.collect().mkString("\n"))
     }
+
+    // Al término de la ejecución cerramos el archivo de salida
     filewriter.close()
   }
 }
