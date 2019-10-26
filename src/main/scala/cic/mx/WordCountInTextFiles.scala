@@ -97,7 +97,7 @@ object WordCountInTextFiles {
     */
     for (tf <- textFiles){
       filewriter.write("\n"+tf+"\n")
-      val text = env.readTextFile(args(0)+"/"+tf)
+      val text = env.readTextFile(inputDir+"/"+tf)
 
       val counts = text.flatMap{ _.toLowerCase.split("\\W+")}
         .map { (_, 1) }
