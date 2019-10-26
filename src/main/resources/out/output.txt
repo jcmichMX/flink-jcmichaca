@@ -1,0 +1,18 @@
+airlinesComments2.txt, airlinesComments1.txt, airlinesComments3.txt, #Files(3)
+****************
+282224,284104,318094,
+****************
+#TotalWordsRead(884422)
+****************
+airlinesComments2.txt
+(kids,139590)
+(flight,35091)
+(seat,107543)
+airlinesComments1.txt
+(times,105578)
+(times,141903)
+(airport,36623)
+airlinesComments3.txt
+(again,119456)
+(address,38334)
+(unreal,160304)
